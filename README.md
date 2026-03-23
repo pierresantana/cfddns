@@ -15,7 +15,7 @@ cd cfddns
 make build
 ```
 
-Binaries are output to `dist/` for linux (amd64/arm64) and darwin (amd64/arm64).
+Binaries are output to `dist/` for linux (amd64/arm64/armv5) and darwin (amd64/arm64).
 
 ## Usage
 
@@ -52,6 +52,41 @@ CF_DOMAIN=example.com
 2. Resolves the Cloudflare zone ID from the domain
 3. Lists existing A records for `<host>.<domain>`
 4. Creates, updates, or skips depending on current state
+
+## systemd
+
+The project includes systemd units to run cfddns every 5 minutes.
+
+### Install
+
+```bash
+# Build and install binary, env file, and systemd units
+sudo make install
+```
+
+This will:
+- Install the binary to `/usr/local/bin/cfddns`
+- Copy `.env` to `/etc/cfddns/env`
+- Install and enable the systemd timer
+
+### Manual setup
+
+1. Copy your `.env` file to `/etc/cfddns/env`
+2. Copy `systemd/cfddns.service` and `systemd/cfddns.timer` to `/etc/systemd/system/`
+3. Enable the timer:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now cfddns.timer
+```
+
+### Check status
+
+```bash
+systemctl status cfddns.timer     # Timer status
+systemctl list-timers cfddns*     # Next run time
+journalctl -u cfddns.service      # Logs
+```
 
 ## Development
 
